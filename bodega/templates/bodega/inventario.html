@@ -1,0 +1,238 @@
+<!-- templates/bodega/inventario.html -->
+{% extends 'bodega/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3><i class="fas fa-boxes me-2"></i>Inventario por Categorías</h3>
+                
+                <!-- Filtros de categoría -->
+                <div class="btn-group" role="group">
+                    <a href="{% url 'inventario' %}" 
+                       class="btn btn-sm {% if not categoria_filtro %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        Todas
+                    </a>
+                    {% for categoria in categorias %}
+                    <a href="{% url 'inventario' %}?categoria={{ categoria.nombre }}" 
+                       class="btn btn-sm {% if categoria_filtro == categoria.nombre %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        {{ categoria.get_nombre_display }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="card-body">
+                {% if categoria_filtro %}
+                    <!-- Vista filtrada por categoría -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Cantidad</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for producto in productos %}
+                                <tr>
+                                    <td><strong>{{ producto.id }}</strong></td>
+                                    <td>{{ producto.nombre }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if producto.cantidad > 5 %}success{% elif producto.cantidad > 0 %}warning{% else %}danger{% endif %}">
+                                            {{ producto.cantidad }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if producto.cantidad > 5 %}
+                                            <span class="badge bg-success">Stock Normal</span>
+                                        {% elif producto.cantidad > 0 %}
+                                            <span class="badge bg-warning">Stock Bajo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Sin Stock</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'editar_producto' producto.id %}" class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'eliminar_producto' producto.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="return confirm('¿Estás seguro de eliminar este producto?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <i class="fas fa-box-open fa-2x mb-2 d-block"></i>
+                                        No hay productos en esta categoría
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <!-- Vista agrupada por categorías -->
+                    {% for categoria, productos_cat in productos_por_categoria.items %}
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <h5 class="mb-0 me-3">
+                                <i class="fas fa-tag me-2 text-primary"></i>
+                                {{ categoria.get_nombre_display }}
+                            </h5>
+                            <span class="badge bg-secondary">{{ productos_cat.count }} producto{{ productos_cat.count|pluralize }}</span>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Cantidad</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for producto in productos_cat %}
+                                    <tr>
+                                        <td><strong>{{ producto.id }}</strong></td>
+                                        <td>{{ producto.nombre }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if producto.cantidad > 5 %}success{% elif producto.cantidad > 0 %}warning{% else %}danger{% endif %}">
+                                                {{ producto.cantidad }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if producto.cantidad > 5 %}
+                                                <span class="badge bg-success">Stock Normal</span>
+                                            {% elif producto.cantidad > 0 %}
+                                                <span class="badge bg-warning">Stock Bajo</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Sin Stock</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'editar_producto' producto.id %}" class="btn btn-sm btn-outline-primary me-1">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="post" action="{% url 'eliminar_producto' producto.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                        onclick="return confirm('¿Estás seguro de eliminar este producto?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-box-open fa-3x mb-3 d-block"></i>
+                        <h5>No hay productos en el inventario</h5>
+                        <p>Comienza agregando tu primer producto</p>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <!-- Formulario para agregar producto -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-plus me-2"></i>Agregar Producto</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Producto</label>
+                        {{ form.nombre }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Categoría</label>
+                        {{ form.categoria }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cantidad</label>
+                        {{ form.cantidad }}
+                    </div>
+                    <button type="submit" name="agregar_producto" class="btn btn-primary w-100">
+                        <i class="fas fa-plus me-2"></i>Agregar Producto
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Formulario para agregar categoría -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-tags me-2"></i>Nueva Categoría</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        {{ categoria_form.nombre }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        {{ categoria_form.descripcion }}
+                    </div>
+                    <button type="submit" name="agregar_categoria" class="btn btn-success w-100 btn-sm">
+                        <i class="fas fa-tag me-2"></i>Crear Categoría
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Resumen por categorías -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-chart-pie me-2"></i>Resumen por Categorías</h6>
+            </div>
+            <div class="card-body">
+                {% for categoria in categorias %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <small>{{ categoria.get_nombre_display }}</small>
+                    <span class="badge bg-info">{{ categoria.productos.count }}</span>
+                </div>
+                {% empty %}
+                <small class="text-muted">No hay categorías creadas</small>
+                {% endfor %}
+                
+                <hr class="my-3">
+                
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h6 class="text-primary">{{ productos|length }}</h6>
+                            <small class="text-muted">Total Productos</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-success">{{ categorias|length }}</h6>
+                        <small class="text-muted">Categorías</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

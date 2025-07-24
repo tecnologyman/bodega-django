@@ -1,0 +1,64 @@
+<!-- templates/bodega/home.html -->
+{% extends 'bodega/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-body text-center p-5">
+                <h1 class="display-4 mb-4">
+                    <i class="fas fa-warehouse text-primary me-3"></i>
+                    Control de Bodega
+                </h1>
+                <p class="lead mb-5">Sistema simple para gestionar inventario, retiros y devoluciones</p>
+                
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-boxes fa-3x text-primary mb-3"></i>
+                                <h5>Inventario</h5>
+                                <p class="text-muted">Gestiona productos y stock</p>
+                                <a href="{% url 'inventario' %}" class="btn btn-primary">Ir a Inventario</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-arrow-right fa-3x text-success mb-3"></i>
+                                <h5>Retiros</h5>
+                                <p class="text-muted">Registra retiros y devoluciones</p>
+                                <a href="{% url 'retiros' %}" class="btn btn-success">Gestionar Retiros</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-search fa-3x text-info mb-3"></i>
+                                <h5>Consultas</h5>
+                                <p class="text-muted">Busca historial por usuario</p>
+                                <a href="{% url 'consulta_usuario' %}" class="btn btn-info">Consultar</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-users fa-3x text-warning mb-3"></i>
+                                <h5>Usuarios</h5>
+                                <p class="text-muted">Administra usuarios del sistema</p>
+                                <a href="{% url 'usuarios' %}" class="btn btn-warning">Ver Usuarios</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

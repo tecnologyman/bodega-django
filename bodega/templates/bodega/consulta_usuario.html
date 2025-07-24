@@ -1,0 +1,107 @@
+{% extends 'bodega/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-search me-2"></i>Buscar Usuario</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">RUT del Usuario</label>
+                        <input type="text" name="rut" class="form-control" 
+                               placeholder="Ej: 12345678-9" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>Buscar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        {% if usuario %}
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-user me-2"></i>{{ usuario.nombre }} - {{ usuario.rut }}</h5>
+            </div>
+            <div class="card-body">
+                {% if retiros %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Fecha Retiro</th>
+                                <th>Fecha Devolución</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for retiro in retiros %}
+                            <tr>
+                                <td>
+                                    <strong>{{ retiro.producto.nombre }}</strong><br>
+                                    <small class="text-muted">ID: {{ retiro.producto.id }}</small>
+                                </td>
+                                <td>{{ retiro.fecha_retiro|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    {% if retiro.fecha_devolucion %}
+                                        {{ retiro.fecha_devolucion|date:"d/m/Y H:i" }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if retiro.devuelto %}
+                                        <span class="badge bg-success">Devuelto</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pendiente</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h4 class="text-primary">{{ retiros|length }}</h4>
+                                <small>Total Retiros</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h4 class="text-warning">
+                                    {% with pendientes=0 %}
+                                        {% for retiro in retiros %}
+                                            {% if not retiro.devuelto %}{{ pendientes|add:"1" }}{% endif %}
+                                        {% endfor %}
+                                    {% endwith %}
+                                </h4>
+                                <small>Pendientes</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                    Este usuario no tiene retiros registrados
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
