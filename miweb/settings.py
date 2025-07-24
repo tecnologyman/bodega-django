@@ -117,7 +117,12 @@ if os.environ.get('RAILWAY_ENVIRONMENT'):
     
     # Configuración de seguridad para producción
     DEBUG = False
-    ALLOWED_HOSTS = ['*']  # Railway maneja el dominio automáticamente
+    ALLOWED_HOSTS = [
+        'bodega.tecnologyman.cl',
+        'web-production-53bb8.up.railway.app',
+        '*.railway.app',
+        '*.up.railway.app'
+        ]  # Railway maneja el dominio automáticamente
     
     # MANTENER SQLite también en producción (más simple)
     DATABASES = {
@@ -140,6 +145,8 @@ if os.environ.get('RAILWAY_ENVIRONMENT'):
     
     # Configuración adicional para Railway
     CSRF_TRUSTED_ORIGINS = [
+        'https://bodega.tecnologyman.cl',
+        'https://web-production-53bb8.up.railway.app',
         'https://*.railway.app',
         'https://*.up.railway.app'
     ]
