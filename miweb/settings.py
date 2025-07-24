@@ -108,7 +108,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # =============================================================================
-# CONFIGURACIÓN PARA RAILWAY (PRODUCCIÓN)
+# CONFIGURACIÓN PARA RAILWAY (PRODUCCIÓN) - VERSIÓN SIMPLIFICADA
 # =============================================================================
 
 # Detectar si estamos en Railway
@@ -119,10 +119,12 @@ if os.environ.get('RAILWAY_ENVIRONMENT'):
     DEBUG = False
     ALLOWED_HOSTS = ['*']  # Railway maneja el dominio automáticamente
     
-    # Base de datos PostgreSQL automática de Railway
-    import dj_database_url
+    # MANTENER SQLite también en producción (más simple)
     DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
     
     # Configuración de archivos estáticos para producción
